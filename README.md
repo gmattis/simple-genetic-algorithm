@@ -4,3 +4,4 @@ Contrary to NEAT-Python, you define a maximum number of neurons for the neural n
 
 ### How to use
 Take a look at the `example.py` file to see the implementation for the XOR gate
+Parameters are located in the library file
