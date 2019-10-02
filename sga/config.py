@@ -7,15 +7,19 @@ IND_OUT_NUMBER = 1  # Number of outputs
 IND_MAX_NODES = 2  # Maximum number of nodes
 
 # Genes mutations
-ADD_GENE_RATE = 0.3  # Probability to add a new gene
-MUT_GENE_RATE = 0.5  # Probability to mutate a gene
-REM_GENE_RATE = 0.3  # Probability to remove a gene
+ADD_GENE_PROB = 0.3  # Probability to add a new gene
+MUT_GENE_PROB = 0.5  # Probability to mutate a gene
+REM_GENE_PROB = 0.3  # Probability to remove a gene
 
-ADD_NODE_RATE = 0.15  # Probability to add a new node
-REM_NODE_RATE = 0.15  # Probability to remove a node
+ADD_NODE_PROB = 0.15  # Probability to add a new node
+REM_NODE_PROB = 0.15  # Probability to remove a node
 
 MUT_GENE_AMP = 0.2  # Gene mutation amplitude
 WEIGHT_AMP = 1  # Default weights amplitude
+
+GENE_PROB_FACT = 0.99  # Each generation, multiply the gene mutations probability by this factor
+NODE_PROB_FACT = 0.99  # Each generation, multiply the node mutations probability by this factor
+AMP_MUT_FACT = 1  # Each generation, multiply the gene mutation amplitude by this factor
 
 # Generations mutations
 ELITISM_RATE = 0.1  # Percent of best individuals kept without mutations

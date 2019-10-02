@@ -1,11 +1,11 @@
-# ToDo: Mutation rates and amplitude factor
 # ToDo: More explicit variables names
-# ToDo: Possibility to save the population and restart the training from a certain state
+# ToDo: Possibility to save the population and resume the training from a certain state
 # ToDo: Automatic saving
 # ToDo: Show more statistics about generations
 # ToDo: Comment
 # ToDo: Input variables typing
 # ToDo: Write a real introduction for all the scripts
+# ToDo: Add a license
 
 from . import config, individual, population
 
@@ -22,17 +22,24 @@ if not 0 < config.IND_OUT_NUMBER:
 if not 0 <= config.IND_MAX_NODES:
     _warning_stack.append("IND_MAX_NODES must be positive")
 
-if not 0 <= config.ADD_GENE_RATE <= 1:
+if not 0 <= config.ADD_GENE_PROB <= 1:
     _warning_stack.append("ADD_GENE_RATE should be between 0 and 1")
-if not 0 <= config.MUT_GENE_RATE <= 1:
+if not 0 <= config.MUT_GENE_PROB <= 1:
     _warning_stack.append("MUT_GENE_RATE should be between 0 and 1")
-if not 0 <= config.REM_GENE_RATE <= 1:
+if not 0 <= config.REM_GENE_PROB <= 1:
     _warning_stack.append("REM_GENE_RATE should be between 0 and 1")
 
-if not 0 <= config.ADD_NODE_RATE <= 1:
+if not 0 <= config.ADD_NODE_PROB <= 1:
     _warning_stack.append("ADD_NODE_RATE should be between 0 and 1")
-if not 0 <= config.REM_NODE_RATE <= 1:
+if not 0 <= config.REM_NODE_PROB <= 1:
     _warning_stack.append("REM_NODE_RATE should be between 0 and 1")
+
+if not 0 < config.GENE_PROB_FACT <= 1:
+    _warning_stack.append("GENE_PROB_FACT must be between 0 and 1")
+if not 0 < config.NODE_PROB_FACT <= 1:
+    _warning_stack.append("NODE_PROB_FACT must be between 0 and 1")
+if not 0 != config.AMP_MUT_FACT:
+    _warning_stack.append("AMP_MUT_FACT should be different than 0")
 
 if not 0 <= config.ELITISM_RATE <= 1:
     _warning_stack.append("ELITISM_RATE should be between 0 and 1")

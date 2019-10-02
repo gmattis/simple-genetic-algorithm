@@ -12,6 +12,9 @@ class Population:
         self.out_act_f = out_act_f
         self.population = np.array([Individual(def_act_f, out_act_f) for _ in range(config.POPULATION_SIZE)])
         self.n_elite = int(config.ELITISM_RATE * config.POPULATION_SIZE)
+        self.gene_prob_factor = 1
+        self.node_prob_factor = 1
+        self.amp_mut_factor = 1
 
     @staticmethod
     def __check_criterion(min_fit, avg_fit, max_fit):
@@ -68,16 +71,16 @@ class Population:
         for i in range(config.POPULATION_SIZE):
             random.seed()
 
-            if random.random() < config.REM_NODE_RATE:
+            if random.random() < config.REM_NODE_PROB * self.node_prob_factor:
                 self.population[i].remove_node()
-            if random.random() < config.REM_GENE_RATE:
+            if random.random() < config.REM_GENE_PROB * self.gene_prob_factor:
                 self.population[i].remove_gene()
 
-            self.population[i].mutate(config.MUT_GENE_RATE, config.MUT_GENE_AMP)
+            self.population[i].mutate(config.MUT_GENE_PROB * self.gene_prob_factor, config.MUT_GENE_AMP * self.amp_mut_factor)
 
-            if random.random() < config.ADD_NODE_RATE:
+            if random.random() < config.ADD_NODE_PROB * self.node_prob_factor:
                 self.population[i].add_node()
-            if random.random() < config.ADD_GENE_RATE:
+            if random.random() < config.ADD_GENE_PROB * self.gene_prob_factor:
                 self.population[i].add_gene()
 
             self.population[i].cleanup()
@@ -100,9 +103,14 @@ class Population:
             print("- min. fitness:", min_fit)
             print("- max. fitness:", max_fit)
             print("- avg. fitness:", avg_fit)
+
             if i < n_gen and not self.__check_criterion(min_fit, avg_fit, max_fit):
                 self.__crossover(np.array(fitness) / np.sum(fitness))
                 self.__mutate()
+
+                self.gene_prob_factor *= config.GENE_PROB_FACT
+                self.node_prob_factor *= config.NODE_PROB_FACT
+                self.amp_mut_factor *= config.AMP_MUT_FACT
             else:
                 break
         print("======[", "END".center(n_digit + 5), "]======")
