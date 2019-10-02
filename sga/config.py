@@ -21,8 +21,9 @@ GENE_PROB_FACT = 0.99  # Each generation, multiply the gene mutations probabilit
 NODE_PROB_FACT = 0.99  # Each generation, multiply the node mutations probability by this factor
 AMP_MUT_FACT = 1  # Each generation, multiply the gene mutation amplitude by this factor
 
-# Generations mutations
-ELITISM_RATE = 0.1  # Percent of best individuals kept without mutations
+# Generations elitism and extinction
+ELITISM_RATE = 0.1  # Percent of best individuals kept without mutations nor crossover
+EXTINCTION_RATE = 0.1  # Percent of worst individuals who will not crossover
 
 # Training conditions
 FITNESS_CRITERION = "avg"  # Fitness threshold criterion to stop training. Valid values are [min, avg, max]

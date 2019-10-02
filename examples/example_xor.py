@@ -31,4 +31,4 @@ m_population = population.Population(sigmoid)
 
 # Run the training for 500 generations
 # Returns the network and their fitness after the last generation sorted by decreasing fitness
-m_population.run(f_eval, 500)
+m_population.run(f_eval, 500, save_interval=50)

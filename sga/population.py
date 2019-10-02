@@ -2,7 +2,7 @@ import numpy as np
 import random
 import time
 
-from . import config
+from . import config, saveload, Callable
 from .individual import Individual
 
 
@@ -10,14 +10,18 @@ class Population:
     def __init__(self, def_act_f, out_act_f=None):
         self.def_act_f = def_act_f
         self.out_act_f = out_act_f
-        self.population = np.array([Individual(def_act_f, out_act_f) for _ in range(config.POPULATION_SIZE)])
+
         self.n_elite = int(config.ELITISM_RATE * config.POPULATION_SIZE)
+        self.n_extinction = int(config.EXTINCTION_RATE * config.POPULATION_SIZE)
+
         self.gene_prob_factor = 1
         self.node_prob_factor = 1
         self.amp_mut_factor = 1
 
+        self.population = np.array([Individual(def_act_f, out_act_f) for _ in range(config.POPULATION_SIZE)])
+
     @staticmethod
-    def __check_criterion(min_fit, avg_fit, max_fit):
+    def __check_criterion(min_fit, avg_fit, max_fit) -> bool:
         if config.FITNESS_CRITERION == "min":
             return config.FITNESS_THRESHOLD <= min_fit
         elif config.FITNESS_CRITERION == "max":
@@ -45,6 +49,11 @@ class Population:
         return mixed_genes
 
     @staticmethod
+    def __normalize_fitness(fitness) -> np.ndarray:  # Applies the Softmax function to the fitness
+        normalized_fitness = np.exp(fitness)
+        return normalized_fitness / np.sum(normalized_fitness)
+
+    @staticmethod
     def __sort_population(fitness) -> list:  # Return the index of the individuals sorted by decreasing fitness
         fitness_copy, index_list = fitness.copy(), []
         for i in range(len(fitness)):
@@ -57,18 +66,20 @@ class Population:
         new_population = np.empty(config.POPULATION_SIZE, dtype=Individual)
 
         sorted_index = self.__sort_population(fitness)
+        normalized_fitness = self.__normalize_fitness([fitness[i] for i in sorted_index[:self.n_extinction]])
+
         for i in range(self.n_elite):
             new_population[i] = self.population[sorted_index[i]]
 
         for i in range(self.n_elite, config.POPULATION_SIZE):
-            parent_a = np.random.choice(self.population, p=fitness)
-            parent_b = np.random.choice(self.population, p=fitness)
+            parent_a = np.random.choice(self.population[:self.n_extinction], p=normalized_fitness)
+            parent_b = np.random.choice(self.population[:self.n_extinction], p=normalized_fitness)
             new_population[i] = Individual(self.def_act_f, self.out_act_f)
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
         self.population = new_population
 
     def __mutate(self):  # Mutate each individuals
-        for i in range(config.POPULATION_SIZE):
+        for i in range(self.n_elite, config.POPULATION_SIZE):
             random.seed()
 
             if random.random() < config.REM_NODE_PROB * self.node_prob_factor:
@@ -76,7 +87,8 @@ class Population:
             if random.random() < config.REM_GENE_PROB * self.gene_prob_factor:
                 self.population[i].remove_gene()
 
-            self.population[i].mutate(config.MUT_GENE_PROB * self.gene_prob_factor, config.MUT_GENE_AMP * self.amp_mut_factor)
+            self.population[i].mutate(config.MUT_GENE_PROB * self.gene_prob_factor,
+                                      config.MUT_GENE_AMP * self.amp_mut_factor)
 
             if random.random() < config.ADD_NODE_PROB * self.node_prob_factor:
                 self.population[i].add_node()
@@ -85,13 +97,16 @@ class Population:
 
             self.population[i].cleanup()
 
-    def run(self, eval_f, n_gen=1000):  # Main loop
+    def load(self, path: str):  # Loads a saved state
+        self.population = saveload.load(path, self.def_act_f, self.out_act_f)
+
+    def run(self, eval_f: Callable, n_gen: int = 500, save_interval: int = None) -> list:  # Main loop
         print("Beginning training!")
         start_time = time.time()
         fitness = []
         n_digit = int(np.log10(n_gen)) + 1
-        for i in range(1, n_gen + 1):
-            print("======[ GEN.", str(i).zfill(n_digit), "]======")
+        for gen in range(1, n_gen + 1):
+            print("======[ GEN.", str(gen).zfill(n_digit), "]======")
             gen_time = time.time()
             fitness = eval_f(self.population)
             print("Done in", format(time.time() - gen_time, '.2f'), "s.")
@@ -104,15 +119,23 @@ class Population:
             print("- max. fitness:", max_fit)
             print("- avg. fitness:", avg_fit)
 
-            if i < n_gen and not self.__check_criterion(min_fit, avg_fit, max_fit):
-                self.__crossover(np.array(fitness) / np.sum(fitness))
+            if gen < n_gen and not self.__check_criterion(min_fit, avg_fit, max_fit):
+                self.__crossover(fitness)
                 self.__mutate()
 
                 self.gene_prob_factor *= config.GENE_PROB_FACT
                 self.node_prob_factor *= config.NODE_PROB_FACT
                 self.amp_mut_factor *= config.AMP_MUT_FACT
+
+                if save_interval is not None and gen % save_interval == 0:
+                    saveload.save(self.population, gen)
             else:
                 break
+
         print("======[", "END".center(n_digit + 5), "]======")
         print("Training ended in", format(time.time() - start_time, '.2f'), "s")
+
+        if save_interval is not None:
+            saveload.save(self.population, "end")
+
         return [self.population[i] for i in self.__sort_population(fitness)]

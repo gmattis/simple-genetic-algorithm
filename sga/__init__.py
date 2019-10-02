@@ -1,13 +1,13 @@
 # ToDo: More explicit variables names
-# ToDo: Possibility to save the population and resume the training from a certain state
-# ToDo: Automatic saving
 # ToDo: Show more statistics about generations
 # ToDo: Comment
 # ToDo: Input variables typing
 # ToDo: Write a real introduction for all the scripts
 # ToDo: Add a license
+# ToDo: Adapt GENE_PROB_FACT, NODE_PROB_FACT and AMP_MU_FACT to take account of the fitness
 
-from . import config, individual, population
+from typing import *
+from . import config, individual, population, saveload
 
 _warning_stack = []
 
@@ -43,6 +43,8 @@ if not 0 != config.AMP_MUT_FACT:
 
 if not 0 <= config.ELITISM_RATE <= 1:
     _warning_stack.append("ELITISM_RATE should be between 0 and 1")
+if not 0 <= config.EXTINCTION_RATE <= 1:
+    _warning_stack.append("EXTINCTION_RATE should be between 0 and 1")
 
 if config.FITNESS_CRITERION not in ["min", "avg", "max"]:
     _warning_stack.append("Invalid value for FITNESS_CRITERION. Should be min, avg or max")
