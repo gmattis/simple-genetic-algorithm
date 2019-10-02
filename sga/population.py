@@ -2,12 +2,14 @@ import numpy as np
 import random
 import time
 
-from . import config, saveload, Callable
+from typing import Callable, List, Optional
+
+from . import config, saveload
 from .individual import Individual
 
 
 class Population:
-    def __init__(self, def_act_f, out_act_f=None):
+    def __init__(self, def_act_f: Callable, out_act_f: Optional[Callable] = None):
         self.def_act_f = def_act_f
         self.out_act_f = out_act_f
 
@@ -21,7 +23,8 @@ class Population:
         self.population = np.array([Individual(def_act_f, out_act_f) for _ in range(config.POPULATION_SIZE)])
 
     @staticmethod
-    def __check_criterion(min_fit, avg_fit, max_fit) -> bool:
+    def __check_criterion(min_fit: float, avg_fit: float, max_fit: float) -> bool:
+        """ Checks if the criterion for stopping the training is verified """
         if config.FITNESS_CRITERION == "min":
             return config.FITNESS_THRESHOLD <= min_fit
         elif config.FITNESS_CRITERION == "max":
@@ -30,7 +33,8 @@ class Population:
             return config.FITNESS_THRESHOLD <= avg_fit
 
     @staticmethod
-    def __mix_genes(genes_a, genes_b) -> np.ndarray:  # Mix genes of individuals
+    def __mix_genes(genes_a: np.ndarray, genes_b: np.ndarray) -> np.ndarray:
+        """ Mixes the genes of two individuals """
         shape = np.shape(genes_a)
         mixed_genes = np.full(shape, np.inf)
         for i in range(shape[0]):
@@ -49,12 +53,14 @@ class Population:
         return mixed_genes
 
     @staticmethod
-    def __normalize_fitness(fitness) -> np.ndarray:  # Applies the Softmax function to the fitness
+    def __normalize_fitness(fitness: List[float]) -> np.ndarray:
+        """ Applies the softmax function to the fitness """
         normalized_fitness = np.exp(fitness)
         return normalized_fitness / np.sum(normalized_fitness)
 
     @staticmethod
-    def __sort_population(fitness) -> list:  # Return the index of the individuals sorted by decreasing fitness
+    def __sort_population(fitness: np.ndarray) -> list:
+        """ Returns the indexes of the individuals sorted by decreasing fitness """
         fitness_copy, index_list = fitness.copy(), []
         for i in range(len(fitness)):
             index_max = np.argmax(fitness_copy)
@@ -62,7 +68,8 @@ class Population:
             index_list.append(index_max)
         return index_list
 
-    def __crossover(self, fitness):  # Do the crossover between individuals
+    def __crossover(self, fitness: np.ndarray):
+        """ Do the crossover between individuals """
         new_population = np.empty(config.POPULATION_SIZE, dtype=Individual)
 
         sorted_index = self.__sort_population(fitness)
@@ -78,7 +85,8 @@ class Population:
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
         self.population = new_population
 
-    def __mutate(self):  # Mutate each individuals
+    def __mutate(self):
+        """ Makes each individual mutate """
         for i in range(self.n_elite, config.POPULATION_SIZE):
             random.seed()
 
@@ -97,18 +105,21 @@ class Population:
 
             self.population[i].cleanup()
 
-    def load(self, path: str):  # Loads a saved state
+    def load(self, path: str):
+        """ Loads a saved state """
         self.population = saveload.load(path, self.def_act_f, self.out_act_f)
 
-    def run(self, eval_f: Callable, n_gen: int = 500, save_interval: int = None) -> list:  # Main loop
+    def run(self, eval_f: Callable, n_gen: Optional[int] = 500, save_interval: Optional[int] = None) -> list:
+        """ Training loop """
         print("Beginning training!")
         start_time = time.time()
-        fitness = []
+        fitness = np.zeros(config.POPULATION_SIZE)
         n_digit = int(np.log10(n_gen)) + 1
+
         for gen in range(1, n_gen + 1):
             print("======[ GEN.", str(gen).zfill(n_digit), "]======")
             gen_time = time.time()
-            fitness = eval_f(self.population)
+            fitness = np.array(eval_f(self.population))
             print("Done in", format(time.time() - gen_time, '.2f'), "s.")
 
             print("STATS:")

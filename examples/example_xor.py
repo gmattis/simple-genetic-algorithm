@@ -30,5 +30,5 @@ def f_eval(pop):
 m_population = population.Population(sigmoid)
 
 # Run the training for 500 generations
-# Returns the network and their fitness after the last generation sorted by decreasing fitness
+# Returns the network after the last generation sorted by decreasing fitness
 m_population.run(f_eval, 500, save_interval=50)

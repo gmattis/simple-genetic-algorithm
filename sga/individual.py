@@ -1,11 +1,13 @@
 import numpy as np
 import random
 
+from typing import Callable, Iterable, List, Tuple, Optional
+
 from . import config
 
 
 class Individual:
-    def __init__(self, def_act_f, out_act_f=None):
+    def __init__(self, def_act_f: Callable, out_act_f: Callable = None):
         # Variables initialization
         self.n_input = config.IND_INP_NUMBER
         self.n_output = config.IND_OUT_NUMBER
@@ -25,7 +27,8 @@ class Individual:
             for j in range(self.n_input):
                 self.genes[i, j] = random.uniform(-1, 1)
 
-    def __available_genes(self):  # Return the list of empty genes
+    def __available_genes(self) -> List[Tuple[int, int]]:
+        """ Returns the list of empty genes """
         available_genes = []
         for i in self.__valid_to_nodes():
             for j in self.__valid_from_nodes():
@@ -33,7 +36,8 @@ class Individual:
                     available_genes.append((i, j))
         return available_genes
 
-    def __existing_genes(self):  # Return the list of existing genes
+    def __existing_genes(self) -> List[Tuple[int, int]]:
+        """ Returns the list of existing genes """
         existing_genes = []
         for i in self.__valid_to_nodes():
             for j in self.__valid_from_nodes():
@@ -41,21 +45,24 @@ class Individual:
                     existing_genes.append((i, j))
         return existing_genes
 
-    def __valid_from_nodes(self) -> list:  # Return the list of nodes usable as input
+    def __valid_from_nodes(self) -> List[int]:
+        """ Returns the list of nodes usable as input """
         valid_nodes = list(range(self.n_input))
         for i in range(self.n_input, self.n_input + self.max_node):
             if not np.all(self.genes[i] == np.inf) and not np.all(self.genes[:, i] == np.inf):
                 valid_nodes.append(i)
         return valid_nodes
 
-    def __valid_to_nodes(self) -> list:  # Return the list of nodes usable as output
+    def __valid_to_nodes(self) -> List[int]:
+        """ Returns the list of nodes usable as output """
         valid_nodes = list(range(self.n_input + self.max_node, self.total_size))
         for i in range(self.n_input, self.n_input + self.max_node):
             if not np.all(self.genes[i] == np.inf) and not np.all(self.genes[:, i] == np.inf):
                 valid_nodes.append(i)
         return valid_nodes
 
-    def __check_path(self, node, already_checked=None):  # Check the network, and remove undesirables genes
+    def __check_path(self, node: int, already_checked: Optional[List[int]] = None):
+        """ Checks the network, and removes undesirables genes """
         if already_checked is None:
             already_checked = []
         if not node < self.n_input:
@@ -78,7 +85,8 @@ class Individual:
                 if self.genes[node, i] != np.inf:
                     self.__check_path(i, already_checked + [node])
 
-    def __process(self, node):  # Predict the node (i)
+    def __process(self, node: int):
+        """ Predicts the node (i) """
         out = 0
         for i in range(self.n_input + self.max_node):
             if self.genes[node, i] != np.inf:
@@ -90,13 +98,15 @@ class Individual:
         else:
             self.values[node] = self.out_act_f(out)
 
-    def add_gene(self):  # Add a new gene between two existing nodes
+    def add_gene(self):
+        """ Adds a new gene between two existing nodes """
         available_genes = self.__available_genes()
         if len(available_genes) > 0:
             new_gene = available_genes[random.randrange(0, len(available_genes))]
             self.genes[new_gene[0], new_gene[1]] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
 
-    def add_node(self):  # Add a new node in the middle of a gene
+    def add_node(self):
+        """ Adds a new node in the middle of a gene """
         existing_genes = self.__existing_genes()
         if len(existing_genes) == 0:
             self.add_gene()
@@ -114,13 +124,15 @@ class Individual:
             self.genes[rep_gene[0], new_node] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
             self.genes[new_node, rep_gene[1]] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
 
-    def remove_gene(self):  # Remove an existing gene
+    def remove_gene(self):
+        """ Removes an existing gene """
         existing_genes = self.__existing_genes()
         if len(existing_genes) > 0:
             selected_gene = existing_genes[random.randrange(0, len(existing_genes))]
             self.genes[selected_gene[0], selected_gene[1]] = np.inf
 
-    def remove_node(self):  # Remove a node and rebuild the network partially
+    def remove_node(self):
+        """ Removes a node and rebuilds the network partially """
         if (self.genes != np.inf).sum() < 2:
             self.remove_gene()
 
@@ -146,18 +158,21 @@ class Individual:
                     if self.genes[i, j] == np.inf and random.random() < 0.5:
                         self.genes[i, j] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
 
-    def mutate(self, rate, amp):  # Mutate the genes
+    def mutate(self, rate: float, amp: float):
+        """ Mutates the genes """
         for i in range(self.n_input, self.total_size):
             for j in range(self.n_input + self.max_node):
                 if random.random() < rate:
                     if self.genes[i, j] != np.inf:
                         self.genes[i, j] += random.uniform(-amp, amp)
 
-    def cleanup(self):  # Clean the network of undesirable genes
+    def cleanup(self):
+        """ Cleans the network by removing undesirables genes """
         for i in range(self.n_input + self.max_node, self.total_size):
             self.__check_path(i)
 
-    def predict(self, inputs) -> np.ndarray:  # Return the prediction of the network
+    def predict(self, inputs: Iterable[float]) -> np.ndarray:
+        """ Returns the prediction of the network """
         self.values.fill(np.inf)
         self.values[:self.n_input] = inputs
         for i in range(self.n_input + self.max_node, self.total_size):
