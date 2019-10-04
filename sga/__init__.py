@@ -39,10 +39,10 @@ if not 0 < config.NODE_PROB_FACT <= 1:
 if not 0 != config.AMP_MUT_FACT:
     _warning_stack.append("AMP_MUT_FACT should be different than 0")
 
-if not 0 <= config.ELITISM_RATE <= 1:
-    _warning_stack.append("ELITISM_RATE should be between 0 and 1")
-if not 0 <= config.EXTINCTION_RATE <= 1:
-    _warning_stack.append("EXTINCTION_RATE should be between 0 and 1")
+if not 0 <= config.ELITISM_NUMBER:
+    _warning_stack.append("ELITISM_RATE should be positive")
+if not 0 <= config.EXTINCTION_NUMBER:
+    _warning_stack.append("EXTINCTION_RATE should be positive")
 
 if config.FITNESS_CRITERION not in ["min", "avg", "max"]:
     _warning_stack.append("Invalid value for FITNESS_CRITERION. Should be min, avg or max")

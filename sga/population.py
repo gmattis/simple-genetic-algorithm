@@ -4,22 +4,25 @@ import time
 
 from typing import Callable, List, Optional
 
-from . import config, saveload
+from . import config, saveload, tracker
 from .individual import Individual
 
 
 class Population:
     def __init__(self, def_act_f: Callable, out_act_f: Optional[Callable] = None):
+        # Activation functions
         self.def_act_f = def_act_f
         self.out_act_f = out_act_f
 
-        self.n_elite = int(config.ELITISM_RATE * config.POPULATION_SIZE)
-        self.n_extinction = int(config.EXTINCTION_RATE * config.POPULATION_SIZE)
-
+        # Mutations probabilities and amplitude factor
         self.gene_prob_factor = 1
         self.node_prob_factor = 1
         self.amp_mut_factor = 1
 
+        # Tracker / Statistics printer
+        self.tracker = tracker.Tracker()
+
+        # Population
         self.population = np.array([Individual(def_act_f, out_act_f) for _ in range(config.POPULATION_SIZE)])
 
     @staticmethod
@@ -73,21 +76,28 @@ class Population:
         new_population = np.empty(config.POPULATION_SIZE, dtype=Individual)
 
         sorted_index = self.__sort_population(fitness)
-        normalized_fitness = self.__normalize_fitness([fitness[i] for i in sorted_index[:self.n_extinction]])
+        normalized_fitness = self.__normalize_fitness([fitness[i] for i in sorted_index[:config.EXTINCTION_NUMBER]])
 
-        for i in range(self.n_elite):
+        # Elite individuals
+        for i in range(config.ELITISM_NUMBER):
             new_population[i] = self.population[sorted_index[i]]
 
-        for i in range(self.n_elite, config.POPULATION_SIZE):
-            parent_a = np.random.choice(self.population[:self.n_extinction], p=normalized_fitness)
-            parent_b = np.random.choice(self.population[:self.n_extinction], p=normalized_fitness)
+        # Crossover between individuals
+        for i in range(config.ELITISM_NUMBER, config.POPULATION_SIZE - config.EXTINCTION_NUMBER):
+            parent_a = np.random.choice(self.population[:config.EXTINCTION_NUMBER], p=normalized_fitness)
+            parent_b = np.random.choice(self.population[:config.EXTINCTION_NUMBER], p=normalized_fitness)
             new_population[i] = Individual(self.def_act_f, self.out_act_f)
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
+
+        # New individuals replacing the extincts ones
+        for i in range(config.POPULATION_SIZE - config.EXTINCTION_NUMBER, config.POPULATION_SIZE):
+            new_population[i] = Individual(self.def_act_f, self.out_act_f)
+
         self.population = new_population
 
     def __mutate(self):
         """ Makes each individual mutate """
-        for i in range(self.n_elite, config.POPULATION_SIZE):
+        for i in range(config.ELITISM_NUMBER, config.POPULATION_SIZE):
             random.seed()
 
             if random.random() < config.REM_NODE_PROB * self.node_prob_factor:
@@ -112,6 +122,9 @@ class Population:
     def run(self, eval_f: Callable, n_gen: Optional[int] = 500, save_interval: Optional[int] = None) -> list:
         """ Training loop """
         print("Beginning training!")
+
+        self.tracker.reset()
+
         start_time = time.time()
         fitness = np.zeros(config.POPULATION_SIZE)
         n_digit = int(np.log10(n_gen)) + 1
@@ -123,14 +136,12 @@ class Population:
             print("Done in", format(time.time() - gen_time, '.2f'), "s.")
 
             print("STATS:")
-            min_fit = np.min(fitness)
-            max_fit = np.max(fitness)
-            avg_fit = np.average(fitness)
-            print("- min. fitness:", min_fit)
-            print("- max. fitness:", max_fit)
-            print("- avg. fitness:", avg_fit)
+            self.tracker.append(fitness)
+            self.tracker.print_stats()
 
-            if gen < n_gen and not self.__check_criterion(min_fit, avg_fit, max_fit):
+            avg_fitness, min_fitness, max_fitness = self.tracker.get_last_stats()
+
+            if gen < n_gen and not self.__check_criterion(min_fitness, avg_fitness, max_fitness):
                 self.__crossover(fitness)
                 self.__mutate()
 
