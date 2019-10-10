@@ -150,7 +150,7 @@ class Population:
                 self.amp_mut_factor *= config.AMP_MUT_FACT
 
                 if save_interval is not None and gen % save_interval == 0:
-                    saveload.save(self.population, gen)
+                    saveload.save([self.population[i] for i in self.__sort_population(fitness)], gen)
             else:
                 break
 

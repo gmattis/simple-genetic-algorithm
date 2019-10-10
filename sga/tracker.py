@@ -58,8 +58,8 @@ class Tracker:
         avg_fitness, min_fitness, max_fitness = self.get_last_stats()
         avg_percent, min_percent, max_percent = self.get_last_percentages()
 
-        stats_len = str(int(np.log10(max(abs(avg_fitness), abs(min_fitness), abs(max_fitness)) * 10000000)) + 1)
-        percent_len = str(int(np.log10(max(abs(avg_percent), abs(min_percent), abs(max_percent)) * 10000000)) + 1)
+        stats_len = str(int(np.log10(max(abs(avg_fitness), abs(min_fitness), abs(max_fitness)) + 1)) + 6)
+        percent_len = str(int(np.log10(max(abs(avg_percent), abs(min_percent), abs(max_percent)) + 1)) + 6)
 
         print("- avg. fitness: {:{}.5f} [ {:{}.5f}% ]".format(avg_fitness, stats_len, avg_percent, percent_len))
         print("- min. fitness: {:{}.5f} [ {:{}.5f}% ]".format(min_fitness, stats_len, min_percent, percent_len))
