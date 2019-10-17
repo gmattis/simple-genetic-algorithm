@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-from sga import population
+from sga import population, config
 
 
 def run_episode(ind, episode_len=500, render=False):
@@ -29,12 +29,13 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
 
-population.config.IND_INP_NUMBER = 4
-population.config.FITNESS_THRESHOLD = 450
+# Define the configuration file
+cartpole_config = config.Config()
+cartpole_config.load("CartpoleConfig.cfg")
 
 # Train the population using a Gym environment
 env = gym.make('CartPole-v1')
-m_population = population.Population(sigmoid, lambda x: 0 if x < 0.5 else 1)
+m_population = population.Population(sigmoid, lambda x: 0 if x < 0.5 else 1, config=cartpole_config)
 trained_pop = m_population.run(evaluate_population)
 
 # Display the best individual

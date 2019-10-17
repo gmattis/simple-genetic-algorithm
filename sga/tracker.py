@@ -2,11 +2,13 @@ import numpy as np
 
 from typing import Iterable, List, Tuple
 
-from . import config
+from .config import Config
 
 
 class Tracker:
-    def __init__(self):
+    def __init__(self, config: Config):
+        self.config = config
+
         # Variables initialization
         self.raw_fitness_tracking = []
         self.avg_fitness_tracking = []
@@ -44,13 +46,16 @@ class Tracker:
     def get_last_percentages(self) -> Tuple[float, float, float]:
         """ Returns the progression in percent for the last generation """
         if len(self.raw_fitness_tracking) > 1:
-            avg_percentage = (self.avg_fitness_tracking[-1] - self.avg_fitness_tracking[-2]) * 100 / config.FITNESS_THRESHOLD
-            min_percentage = (self.min_fitness_tracking[-1] - self.min_fitness_tracking[-2]) * 100 / config.FITNESS_THRESHOLD
-            max_percentage = (self.max_fitness_tracking[-1] - self.max_fitness_tracking[-2]) * 100 / config.FITNESS_THRESHOLD
+            avg_percentage = (self.avg_fitness_tracking[-1] - self.avg_fitness_tracking[-2]) * \
+                             100 / self.config.FITNESS_THRESHOLD
+            min_percentage = (self.min_fitness_tracking[-1] - self.min_fitness_tracking[-2]) * \
+                             100 / self.config.FITNESS_THRESHOLD
+            max_percentage = (self.max_fitness_tracking[-1] - self.max_fitness_tracking[-2]) * \
+                             100 / self.config.FITNESS_THRESHOLD
         else:
-            avg_percentage = self.avg_fitness_tracking[-1] * 100 / config.FITNESS_THRESHOLD
-            min_percentage = self.min_fitness_tracking[-1] * 100 / config.FITNESS_THRESHOLD
-            max_percentage = self.max_fitness_tracking[-1] * 100 / config.FITNESS_THRESHOLD
+            avg_percentage = self.avg_fitness_tracking[-1] * 100 / self.config.FITNESS_THRESHOLD
+            min_percentage = self.min_fitness_tracking[-1] * 100 / self.config.FITNESS_THRESHOLD
+            max_percentage = self.max_fitness_tracking[-1] * 100 / self.config.FITNESS_THRESHOLD
         return avg_percentage, min_percentage, max_percentage
 
     def print_stats(self):

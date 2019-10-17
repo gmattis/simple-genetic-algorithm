@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-from sga import population
+from sga import population, config
 
 
 def run_episode(ind, episode_len=500, render=False):
@@ -25,18 +25,13 @@ def evaluate_population(pop):
     return fitness
 
 
-population.config.IND_INP_NUMBER = 24
-population.config.IND_OUT_NUMBER = 4
-population.config.IND_MAX_NODES = 10
-population.config.GENE_PROB_FACT = 1
-population.config.NODE_PROB_FACT = 1
-population.config.FITNESS_THRESHOLD = 300
-population.config.FITNESS_CRITERION = "max"
+# Define the configuration file
+bipedal_config = config.Config()
+bipedal_config.load("BipedalWalkerConfig.cfg")
 
 # Train the population using a Gym environment
 env = gym.make('BipedalWalker-v2')
-m_population = population.Population(np.tanh)
-m_population.load("sga-state-25.npy")
+m_population = population.Population(np.tanh, config=bipedal_config)
 trained_pop = m_population.run(evaluate_population, save_interval=10)
 
 # Display the best individual

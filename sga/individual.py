@@ -3,11 +3,13 @@ import random
 
 from typing import Callable, Iterable, List, Tuple, Optional
 
-from . import config
+from .config import Config
 
 
 class Individual:
-    def __init__(self, def_act_f: Callable, out_act_f: Callable = None):
+    def __init__(self, config: Config, def_act_f: Callable, out_act_f: Callable = None):
+        self.config = config
+
         # Variables initialization
         self.n_input = config.IND_INP_NUMBER
         self.n_output = config.IND_OUT_NUMBER
@@ -103,7 +105,7 @@ class Individual:
         available_genes = self.__available_genes()
         if len(available_genes) > 0:
             new_gene = available_genes[random.randrange(0, len(available_genes))]
-            self.genes[new_gene[0], new_gene[1]] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
+            self.genes[new_gene[0], new_gene[1]] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
 
     def add_node(self):
         """ Adds a new node in the middle of a gene """
@@ -121,8 +123,8 @@ class Individual:
             rep_gene = existing_genes[random.randrange(0, len(existing_genes))]
             new_node = np.random.choice(empty_nodes)
             self.genes[rep_gene[0], rep_gene[1]] = np.inf
-            self.genes[rep_gene[0], new_node] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
-            self.genes[new_node, rep_gene[1]] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
+            self.genes[rep_gene[0], new_node] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
+            self.genes[new_node, rep_gene[1]] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
 
     def remove_gene(self):
         """ Removes an existing gene """
@@ -156,7 +158,7 @@ class Individual:
             for i in to_nodes:
                 for j in from_nodes:
                     if self.genes[i, j] == np.inf and random.random() < 0.5:
-                        self.genes[i, j] = random.uniform(- config.WEIGHT_AMP, config.WEIGHT_AMP)
+                        self.genes[i, j] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
 
     def mutate(self, rate: float, amp: float):
         """ Mutates the genes """
