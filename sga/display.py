@@ -19,6 +19,8 @@ def display_genome(individual: Individual, config: Config, display=True):
     input_dot = Digraph(name="input_subgraph", graph_attr={"rank": "min"})
     for node in range(config.IND_INP_NUMBER):
         input_dot.node(str(node), str(node), color='blue')
+    for node in range(config.IND_INP_NUMBER - 1):
+        input_dot.edge(str(node), str(node + 1), style="invis")
 
     hidden_dot = Digraph(name="hidden_subgraph")
     for node in range(config.IND_INP_NUMBER, config.IND_INP_NUMBER + config.IND_MAX_NODES):
@@ -34,6 +36,8 @@ def display_genome(individual: Individual, config: Config, display=True):
         for from_node in range(total_nodes):
             if individual.genes[node][from_node] != np.inf:
                 dot.edge(str(from_node), str(node), label=str(round(individual.genes[node][from_node], 3)))
+    for node in range(config.IND_INP_NUMBER + config.IND_MAX_NODES, total_nodes - 1):
+        output_dot.edge(str(node), str(node + 1), style="invis")
 
     dot.subgraph(input_dot)
     dot.subgraph(hidden_dot)
