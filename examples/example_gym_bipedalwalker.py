@@ -1,7 +1,7 @@
 import numpy as np
 import gym
 
-from sga import population, config
+from sga import population, config, display
 
 
 def run_episode(ind, episode_len=500, render=False):
@@ -32,7 +32,10 @@ bipedal_config.load("BipedalWalkerConfig.cfg")
 # Train the population using a Gym environment
 env = gym.make('BipedalWalker-v2')
 m_population = population.Population(np.tanh, config=bipedal_config)
-trained_pop = m_population.run(evaluate_population, save_interval=10)
+trained_pop = m_population.run(evaluate_population, save_interval=20)
+
+# Display the neural network of the best individual
+display.display_genome(trained_pop[0], bipedal_config)
 
 # Display the best individual
 run_episode(trained_pop[0], episode_len=100000, render=True)

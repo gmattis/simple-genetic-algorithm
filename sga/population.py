@@ -96,7 +96,7 @@ class Population:
             new_population[i] = Individual(self.config, self.def_act_f, self.out_act_f)
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
 
-        # New individuals replacing the extincts ones
+        # New individuals replacing the extincted ones
         for i in range(self.config.POPULATION_SIZE - self.config.EXTINCTION_NUMBER, self.config.POPULATION_SIZE):
             new_population[i] = Individual(self.config, self.def_act_f, self.out_act_f)
 

@@ -3,7 +3,7 @@ A basic example of using the library to train a population with the XOR gate
 """
 import numpy
 
-from sga import population
+from sga import population, display
 
 
 xor_inputs = [(0, 0), (0, 1), (1, 0), (1, 1)]
@@ -30,5 +30,7 @@ def f_eval(pop):
 m_population = population.Population(sigmoid)
 
 # Run the training for 500 generations
-# Returns the network after the last generation sorted by decreasing fitness
-m_population.run(f_eval, 500)
+ind = m_population.run(f_eval, 500)[0]
+
+# Display the neural network of the best individual
+display.display_genome(ind, m_population.config)
