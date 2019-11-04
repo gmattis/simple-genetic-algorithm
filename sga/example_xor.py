@@ -1,9 +1,9 @@
 """
 A basic example of using the library to train a population with the XOR gate
 """
-import numpy
+import math
 
-from sga import population, display
+from . import population
 
 
 xor_inputs = [(0, 0), (0, 1), (1, 0), (1, 1)]
@@ -12,7 +12,7 @@ xor_outputs = [0, 1, 1, 0]
 
 # Sigmoid function, used as activation function
 def sigmoid(x):
-    return 1 / (1 + numpy.exp(-x))
+    return 1 / (1 + math.exp(-x))
 
 
 # Evaluation function, basically test 100 times each network
@@ -31,6 +31,3 @@ m_population = population.Population(sigmoid)
 
 # Run the training for 500 generations
 ind = m_population.run(f_eval, 500)[0]
-
-# Display the neural network of the best individual
-display.display_genome(ind, m_population.config)

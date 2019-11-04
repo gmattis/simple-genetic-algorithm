@@ -6,11 +6,4 @@
 # ToDo: Verify the settings are correct when loading a state
 # ToDo: Fix the XOR example
 
-try:
-    from graphviz import Digraph
-except ImportError:
-    print("It seems that the Graphviz library is not installed. "
-          "You won't be able to display the neural network of individuals.")
-    import time
-    time.sleep(1)
-    del time
+print("Welcome to the minimal version! Take a sit!")
