@@ -3,7 +3,7 @@ A basic example of using the library to train a population with the XOR gate
 """
 import math
 
-from . import population
+import population
 
 
 xor_inputs = [(0, 0), (0, 1), (1, 0), (1, 1)]
@@ -30,4 +30,4 @@ def f_eval(pop):
 m_population = population.Population(sigmoid)
 
 # Run the training for 500 generations
-ind = m_population.run(f_eval, 500)[0]
+ind = m_population.run(f_eval, 1000)[0]

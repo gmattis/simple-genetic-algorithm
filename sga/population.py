@@ -1,9 +1,9 @@
 import math
 import random
 
-from . import tracker
-from .config import Config
-from .individual import Individual
+import tracker
+from config import Config
+from individual import Individual
 
 
 class Population:
@@ -52,7 +52,7 @@ class Population:
                     else:
                         mixed_genes[i][j] = genes_a[i][j]
                 else:
-                    if genes_b[i, j] != "inf":
+                    if genes_b[i][j] != "inf":
                         mixed_genes[i][j] = genes_b[i][j]
         return mixed_genes
 
@@ -94,8 +94,8 @@ class Population:
 
         # Crossover between individuals
         for i in range(self.config.ELITISM_NUMBER, self.config.POPULATION_SIZE - self.config.EXTINCTION_NUMBER):
-            parent_a = random.choices(self.population[:self.config.EXTINCTION_NUMBER], weights=normalized_fitness)
-            parent_b = random.choices(self.population[:self.config.EXTINCTION_NUMBER], weights=normalized_fitness)
+            parent_a = random.choices(self.population[:self.config.EXTINCTION_NUMBER], weights=normalized_fitness)[0]
+            parent_b = random.choices(self.population[:self.config.EXTINCTION_NUMBER], weights=normalized_fitness)[0]
             new_population[i] = Individual(self.config, self.def_act_f, self.out_act_f)
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
 

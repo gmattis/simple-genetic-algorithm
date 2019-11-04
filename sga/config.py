@@ -20,9 +20,9 @@ class Config:
         self.MUT_GENE_AMP = 0.2
         self.WEIGHT_AMP = 1
 
-        self.GENE_PROB_FACT = 0.99
-        self.NODE_PROB_FACT = 0.99
-        self.AMP_MUT_FACT = 0.99
+        self.GENE_PROB_FACT = 1
+        self.NODE_PROB_FACT = 1
+        self.AMP_MUT_FACT = 1
 
         # Elitism and extinction
         self.ELITISM_NUMBER = 10

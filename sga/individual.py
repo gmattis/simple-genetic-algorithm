@@ -1,6 +1,6 @@
 import random
 
-from .config import Config
+from config import Config
 
 
 class Individual:
@@ -53,8 +53,12 @@ class Individual:
     def __count_occ(table, x):
         count = 0
         for i in table:
-            for j in i:
-                if j == x:
+            if type(i) == list:
+                for j in i:
+                    if j == x:
+                        count += 1
+            else:
+                if i == x:
                     count += 1
         return count
 
