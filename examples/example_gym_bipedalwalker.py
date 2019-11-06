@@ -31,8 +31,8 @@ bipedal_config.load("BipedalWalkerConfig.cfg")
 
 # Train the population using a Gym environment
 env = gym.make('BipedalWalker-v2')
-m_population = population.Population(np.tanh, config=bipedal_config)
-trained_pop = m_population.run(evaluate_population, save_interval=20)
+m_population = population.Population(activation_function="tanh", config=bipedal_config)
+trained_pop = m_population.run(evaluate_population, save=True, save_interval=50)
 
 # Display the neural network of the best individual
 display.display_genome(trained_pop[0], bipedal_config)

@@ -4,7 +4,7 @@ from .config import Config
 from .individual import Individual
 
 
-def display_genome(individual: Individual, config: Config, display=True):
+def display_genome(individual: Individual, config: Config, display=True, filename="best-individual"):
     """ Displays the neural network of an individual """
     total_nodes = config.IND_INP_NUMBER + config.IND_MAX_NODES + config.IND_OUT_NUMBER
 
@@ -14,7 +14,7 @@ def display_genome(individual: Individual, config: Config, display=True):
         print("An error occured while importing Graphviz. You should check if you have installed it.")
         return
 
-    dot = Digraph(name="best_individual", format="png", graph_attr={"rankdir": "LR", "splines": "spline"})
+    dot = Digraph(name=filename, format="png", graph_attr={"rankdir": "LR", "splines": "spline"})
 
     input_dot = Digraph(name="input_subgraph", graph_attr={"rank": "min"})
     for node in range(config.IND_INP_NUMBER):

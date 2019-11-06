@@ -7,7 +7,7 @@ from .config import Config
 
 
 class Individual:
-    def __init__(self, config: Config, def_act_f: Callable, out_act_f: Callable = None):
+    def __init__(self, config: Config, activation_function: Callable, out_activation_function: Callable):
         self.config = config
 
         # Variables initialization
@@ -15,12 +15,8 @@ class Individual:
         self.n_output = config.IND_OUT_NUMBER
         self.max_node = config.IND_MAX_NODES
         self.total_size = self.n_input + self.n_output + self.max_node
-        self.def_act_f = def_act_f
-
-        if out_act_f is None:
-            self.out_act_f = def_act_f
-        else:
-            self.out_act_f = out_act_f
+        self.activation_function = activation_function
+        self.out_activation_function = out_activation_function
 
         # Genes generation
         self.genes = np.full((self.total_size, self.total_size), np.inf)
@@ -30,7 +26,7 @@ class Individual:
                 self.genes[i, j] = random.uniform(-1, 1)
 
     def __available_genes(self) -> List[Tuple[int, int]]:
-        """ Returns the list of empty genes """
+        """ Returns the list of available genes """
         available_genes = []
         for i in self.__valid_to_nodes():
             for j in self.__valid_from_nodes():
@@ -96,21 +92,21 @@ class Individual:
                     self.__process(i)
                 out += self.values[i] * self.genes[node, i]
         if node < self.n_input + self.max_node:
-            self.values[node] = self.def_act_f(out)
+            self.values[node] = self.activation_function(out)
         else:
-            self.values[node] = self.out_act_f(out)
+            self.values[node] = self.out_activation_function(out)
 
     def add_gene(self):
         """ Adds a new gene between two existing nodes """
         available_genes = self.__available_genes()
-        if len(available_genes) > 0:
-            new_gene = available_genes[random.randrange(0, len(available_genes))]
+        if available_genes:
+            new_gene = random.choice(available_genes)
             self.genes[new_gene[0], new_gene[1]] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
 
     def add_node(self):
         """ Adds a new node in the middle of a gene """
         existing_genes = self.__existing_genes()
-        if len(existing_genes) == 0:
+        if not existing_genes:
             self.add_gene()
             return
 
@@ -119,9 +115,9 @@ class Individual:
             if np.all(self.genes[i] == np.inf):
                 empty_nodes.append(i)
 
-        if len(empty_nodes) > 0 and len(existing_genes) > 0:
+        if empty_nodes:
             rep_gene = existing_genes[random.randrange(0, len(existing_genes))]
-            new_node = np.random.choice(empty_nodes)
+            new_node = random.choice(empty_nodes)
             self.genes[rep_gene[0], rep_gene[1]] = np.inf
             self.genes[rep_gene[0], new_node] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
             self.genes[new_node, rep_gene[1]] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
@@ -129,22 +125,19 @@ class Individual:
     def remove_gene(self):
         """ Removes an existing gene """
         existing_genes = self.__existing_genes()
-        if len(existing_genes) > 0:
-            selected_gene = existing_genes[random.randrange(0, len(existing_genes))]
+        if len(existing_genes) > 1:
+            selected_gene = random.choice(existing_genes)
             self.genes[selected_gene[0], selected_gene[1]] = np.inf
 
     def remove_node(self):
         """ Removes a node and rebuilds the network partially """
-        if (self.genes != np.inf).sum() < 2:
-            self.remove_gene()
-
-        available_nodes = []
+        existing_nodes = []
         for i in range(self.n_input, self.n_input + self.max_node):
             if np.any(self.genes[i] != np.inf):
-                available_nodes.append(i)
+                existing_nodes.append(i)
 
-        if len(available_nodes) > 0:
-            rem_node = np.random.choice(available_nodes)
+        if existing_nodes:
+            rem_node = random.choice(existing_nodes)
             from_nodes, to_nodes = [], []
             for i in range(self.n_input + self.max_node):
                 if self.genes[rem_node, i] != np.inf:
@@ -160,20 +153,20 @@ class Individual:
                     if self.genes[i, j] == np.inf and random.random() < 0.5:
                         self.genes[i, j] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)
 
-    def mutate(self, rate: float, amp: float):
+    def mutate(self, rate: float, amplitude: float):
         """ Mutates the genes """
         for i in range(self.n_input, self.total_size):
             for j in range(self.n_input + self.max_node):
                 if random.random() < rate:
                     if self.genes[i, j] != np.inf:
-                        self.genes[i, j] += random.uniform(-amp, amp)
+                        self.genes[i, j] += random.uniform(- amplitude, amplitude)
 
     def cleanup(self):
         """ Cleans the network by removing undesirables genes """
         for i in range(self.n_input + self.max_node, self.total_size):
             self.__check_path(i)
 
-    def predict(self, inputs: Iterable[float]) -> np.ndarray:
+    def predict(self, inputs: Iterable[float]) -> Iterable:
         """ Returns the prediction of the network """
         self.values.fill(np.inf)
         self.values[:self.n_input] = inputs
