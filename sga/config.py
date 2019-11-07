@@ -29,6 +29,9 @@ class Config:
             _warning_stack.append("MUT_GENE_RATE should be between 0 and 1")
         if not 0 <= self.REM_GENE_PROB <= 1:
             _warning_stack.append("REM_GENE_RATE should be between 0 and 1")
+        if self.INITIAL_GENERATION not in ["full", "random", "random-nodes"]:
+            _warning_stack.append("Invalid value for INITIAL_GENERATION. Should be full, random or random-nodes")
+            self.INITIAL_GENERATION = "full"
 
         if not 0 <= self.ADD_NODE_PROB <= 1:
             _warning_stack.append("ADD_NODE_RATE should be between 0 and 1")
@@ -69,6 +72,7 @@ class Config:
         self.IND_INP_NUMBER = self.config_file.getint('Individual', 'IND_INP_NUMBER')
         self.IND_OUT_NUMBER = self.config_file.getint('Individual', 'IND_OUT_NUMBER')
         self.IND_MAX_NODES = self.config_file.getint('Individual', 'IND_MAX_NODES')
+        self.INITIAL_GENERATION = self.config_file.get('Individual', 'INITIAL_GENERATION')
 
         # Genes mutations
         self.ADD_GENE_PROB = self.config_file.getfloat('Mutations', 'ADD_GENE_PROB')

@@ -21,9 +21,26 @@ class Individual:
         # Genes generation
         self.genes = np.full((self.total_size, self.total_size), np.inf)
         self.values = np.full(self.total_size, np.inf)
-        for i in range(self.n_input + self.max_node, self.total_size):
-            for j in range(self.n_input):
-                self.genes[i, j] = random.uniform(-1, 1)
+
+        if config.INITIAL_GENERATION == "full":
+            for i in range(self.n_input + self.max_node, self.total_size):
+                for j in range(self.n_input):
+                    self.genes[i, j] = random.uniform(-1, 1)
+        elif config.INITIAL_GENERATION == "random":
+            for i in range(self.n_input + self.max_node, self.total_size):
+                for j in range(self.n_input):
+                    if random.random() < 0.5:
+                        self.genes[i, j] = random.uniform(-1, 1)
+        elif config.INITIAL_GENERATION == "random-nodes":
+            for i in range(self.n_input + self.max_node, self.total_size):
+                for j in range(self.n_input):
+                    self.genes[i, j] = random.uniform(-1, 1)
+            for _ in range(self.n_input, self.n_input + self.max_node):
+                if random.random() < 0.5:
+                    self.add_node()
+            for _ in range(self.n_input, self.n_input + self.max_node):
+                if random.random() < 0.5:
+                    self.add_gene()
 
     def __available_genes(self) -> List[Tuple[int, int]]:
         """ Returns the list of available genes """
