@@ -7,7 +7,8 @@ from .config import Config
 
 
 class Individual:
-    def __init__(self, config: Config, activation_function: Callable, out_activation_function: Callable):
+    def __init__(self, config: Config, activation_function: Callable, out_activation_function: Callable,
+                 generate_network: Optional[bool] = True):
         self.config = config
 
         # Variables initialization
@@ -22,25 +23,26 @@ class Individual:
         self.genes = np.full((self.total_size, self.total_size), np.inf)
         self.values = np.full(self.total_size, np.inf)
 
-        if config.INITIAL_GENERATION == "full":
-            for i in range(self.n_input + self.max_node, self.total_size):
-                for j in range(self.n_input):
-                    self.genes[i, j] = random.uniform(-1, 1)
-        elif config.INITIAL_GENERATION == "random":
-            for i in range(self.n_input + self.max_node, self.total_size):
-                for j in range(self.n_input):
-                    if random.random() < 0.5:
+        if generate_network:
+            if config.INITIAL_GENERATION == "full":
+                for i in range(self.n_input + self.max_node, self.total_size):
+                    for j in range(self.n_input):
                         self.genes[i, j] = random.uniform(-1, 1)
-        elif config.INITIAL_GENERATION == "random-nodes":
-            for i in range(self.n_input + self.max_node, self.total_size):
-                for j in range(self.n_input):
-                    self.genes[i, j] = random.uniform(-1, 1)
-            for _ in range(self.n_input, self.n_input + self.max_node):
-                if random.random() < 0.5:
-                    self.add_node()
-            for _ in range(self.n_input, self.n_input + self.max_node):
-                if random.random() < 0.5:
-                    self.add_gene()
+            elif config.INITIAL_GENERATION == "random":
+                for i in range(self.n_input + self.max_node, self.total_size):
+                    for j in range(self.n_input):
+                        if random.random() < 0.5:
+                            self.genes[i, j] = random.uniform(-1, 1)
+            elif config.INITIAL_GENERATION == "random-nodes":
+                for i in range(self.n_input + self.max_node, self.total_size):
+                    for j in range(self.n_input):
+                        self.genes[i, j] = random.uniform(-1, 1)
+                for _ in range(self.n_input, self.n_input + self.max_node):
+                    if random.random() < 0.5:
+                        self.add_node()
+                for _ in range(self.n_input, self.n_input + self.max_node):
+                    if random.random() < 0.5:
+                        self.add_gene()
 
     def __available_genes(self) -> List[Tuple[int, int]]:
         """ Returns the list of available genes """

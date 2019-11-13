@@ -99,7 +99,8 @@ class Population:
         for i in range(self.config.ELITISM_NUMBER, self.config.POPULATION_SIZE - self.config.EXTINCTION_NUMBER):
             parent_a, parent_b = random.choices(self.population[:self.config.EXTINCTION_NUMBER],
                                                 weights=normalized_fitness, k=2)
-            new_population[i] = Individual(self.config, self.activation_function, self.out_activation_function)
+            new_population[i] = Individual(self.config, self.activation_function, self.out_activation_function,
+                                           generate_network=False)
             new_population[i].genes = self.__mix_genes(parent_a.genes, parent_b.genes)
 
         # New individuals replacing the extincted ones
