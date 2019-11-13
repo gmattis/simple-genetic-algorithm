@@ -133,7 +133,7 @@ class Individual:
                 empty_nodes.append(i)
 
         if empty_nodes:
-            rep_gene = existing_genes[random.randrange(0, len(existing_genes))]
+            rep_gene = random.choice(existing_genes)
             new_node = random.choice(empty_nodes)
             self.genes[rep_gene[0], rep_gene[1]] = np.inf
             self.genes[rep_gene[0], new_node] = random.uniform(- self.config.WEIGHT_AMP, self.config.WEIGHT_AMP)

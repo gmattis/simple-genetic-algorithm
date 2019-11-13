@@ -26,4 +26,4 @@ m_population = population.Population(activation_function="sigmoid")
 ind = m_population.run(f_eval, 500)[0]
 
 # Display the neural network of the best individual
-display.display_genome(ind, m_population.config)
+display.display_genome(ind, m_population.config, display=True)
