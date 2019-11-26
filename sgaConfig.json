@@ -1,0 +1,37 @@
+{
+
+	"population": {
+		"populationSize": 100
+	},
+	
+	"individual": {
+		"inputNumber": 2,
+		"outputNumber": 1,
+		"maxNodes": 2,
+		"initialGeneration": "FULL"
+	},
+	
+	"mutations": {
+		"addGeneProb": 0.3,
+		"mutateGeneProb": 0.5,
+		"removeGeneProb": 0.3,
+		"addNodeProb": 0.15,
+		"removeNodeProb": 0.15,
+		"geneMutationAplitude": 0.2,
+		"weightsAmplitude": 1.0,
+		"geneMutationsFactor": 1.0,
+		"nodeFactor": 1.0,
+		"geneMutationAplitudeFactor": 1.0
+	},
+	
+	"crossover": {
+		"elitismNumber": 5,
+		"extinctionNumber": 2
+	},
+	
+	"training": {
+		"fitnessCriterion": "AVG",
+		"fitnessThreshold": 3.5
+	}
+	
+}
