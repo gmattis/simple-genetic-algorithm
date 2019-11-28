@@ -6,6 +6,7 @@ public class Config {
 	private IndividualConfig individual;
 	private CrossoverConfig crossover;
 	private TrainingConfig training;
+	private MutationsConfig mutations;
 	
 	public PopulationConfig getPopulation() {
 		return population;
@@ -37,5 +38,13 @@ public class Config {
 
 	public void setTraining(TrainingConfig training) {
 		this.training = training;
+	}
+
+	public MutationsConfig getMutations() {
+		return mutations;
+	}
+
+	public void setMutations(MutationsConfig mutations) {
+		this.mutations = mutations;
 	}
 }

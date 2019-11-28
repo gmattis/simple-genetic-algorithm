@@ -1,4 +1,4 @@
-package com.github.gmattis.simplegeneticalgorithm;
+package com.github.gmattis.simplegeneticalgorithm.handlers;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package com.github.gmattis.simplegeneticalgorithm;
+package com.github.gmattis.simplegeneticalgorithm.util;
 
 public enum Activation {
 	
