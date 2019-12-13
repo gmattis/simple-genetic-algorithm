@@ -5,13 +5,15 @@ import time
 
 from typing import Callable, List, Optional
 
-from . import saveload, tracker, activation
+from . import saveload, tracker
 from .individual import Individual
 from .config import Config
 
 
 class Population:
-    def __init__(self, activation_function: str, out_activation_function: Optional[str] = None, config: Config = None):
+    def __init__(self, activation_function: Callable, out_activation_function: Optional[Callable] = None,
+                 config: Config = None):
+
         if out_activation_function is None:
             out_activation_function = activation_function
 
@@ -21,8 +23,8 @@ class Population:
             self.config = config
 
         # Activation functions
-        self.activation_function = activation.get_function(activation_function)
-        self.out_activation_function = activation.get_function(out_activation_function)
+        self.activation_function = activation_function
+        self.out_activation_function = out_activation_function
 
         # Mutations probabilities and amplitude factor
         self.gene_probability_factor = 1

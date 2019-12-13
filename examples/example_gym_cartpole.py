@@ -1,6 +1,6 @@
 import gym
 
-from sga import population, config, display
+from sga import population, config, activation, display
 
 
 def normalize_output(x):
@@ -34,8 +34,8 @@ cartpole_config.load("CartpoleConfig.cfg")
 
 # Train the population using a Gym environment
 env = gym.make('CartPole-v1')
-m_population = population.Population(activation_function="sigmoid",
-                                     out_activation_function="identity",
+m_population = population.Population(activation_function=activation.sigmoid,
+                                     out_activation_function=activation.identity,
                                      config=cartpole_config)
 trained_pop = m_population.run(evaluate_population, save=True, save_interval=50)
 

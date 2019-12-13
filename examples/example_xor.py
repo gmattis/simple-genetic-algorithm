@@ -1,7 +1,7 @@
 """
 A basic example of using the library to train a population with the XOR gate
 """
-from sga import population, display
+from sga import population, activation, display
 
 
 xor_inputs = [(0, 0), (0, 1), (1, 0), (1, 1)]
@@ -20,7 +20,7 @@ def f_eval(pop):
 
 
 # Instantiate the population
-m_population = population.Population(activation_function="sigmoid")
+m_population = population.Population(activation_function=activation.sigmoid)
 
 # Run the training for 500 generations
 ind = m_population.run(f_eval, 500)[0]
