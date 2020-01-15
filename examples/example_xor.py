@@ -9,7 +9,7 @@ xor_outputs = [0, 1, 1, 0]
 
 
 # Evaluation function, basically test 100 times each network
-# It must takes an array as parameter, and returns an array of the same size for the fitness of the networks.
+# It takes an array as parameter, and returns an array of the same size for the fitness of the networks.
 # The higher the fitness, the better the network is
 def f_eval(pop):
     fitness = [4 for _ in range(len(pop))]
